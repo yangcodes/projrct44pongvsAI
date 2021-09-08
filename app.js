@@ -11,10 +11,10 @@ let wall = new Audio();
 
 hit.src = "sounds/hit.mp3";
 wall.src = "sounds/wall.mp3";
-AIScore = "sounds/AIScore.mp3";
-RIScore = "sounds/RIScore.mp3";
+AIScore.src = "sounds/AIScore.mp3";
+RIScore.src = "sounds/RIScore.mp3";
 
-//the RI player paddle
+// The RI Player Paddle
 const playerPaddleRI = {
   xP: 0,
   yP: canvasEl.height / 2 - 100 / 2,
@@ -24,7 +24,7 @@ const playerPaddleRI = {
   score: 0,
 };
 
-//the AI player paddle
+// The AI Player Paddle
 const playerPaddleAI = {
   xP: canvasEl.width - 10,
   yP: canvasEl.height / 2 - 100 / 2,
@@ -34,7 +34,7 @@ const playerPaddleAI = {
   score: 0,
 };
 
-//creating the ball
+// Creating the Ball
 const ball = {
   xP: canvasEl.width / 2,
   yP: canvasEl.height / 2,
@@ -45,7 +45,7 @@ const ball = {
   color: "white",
 };
 
-//creating the net
+// Creating the new
 const net = {
   xP: canvasEl.width / 2 - 1,
   yP: 0,
@@ -54,13 +54,13 @@ const net = {
   color: "white",
 };
 
-//drawing the canvas
+// Drawing the canvas
 function drawRect(xP, yP, width, height, color) {
-  (canvasContext.fillStyle = color),
-    canvasContext.fillRect(xP, yP, width, height);
+  canvasContext.fillStyle = color;
+  canvasContext.fillRect(xP, yP, width, height);
 }
 
-//drawing the ball
+// Drawing a circle
 function drawCircle(xP, yP, radius, color) {
   canvasContext.fillStyle = color;
   canvasContext.beginPath();
@@ -68,43 +68,43 @@ function drawCircle(xP, yP, radius, color) {
   canvasContext.fill();
 }
 
-//drawing the text
+// Drawing the text
 function drawText(content, xP, yP, color) {
   canvasContext.fillStyle = color;
   canvasContext.font = "35px sans-serif";
   canvasContext.fillText(content, xP, yP);
 }
 
-//drawing the net
+// Drawing the net
 function drawNet() {
   for (let i = 0; i < canvasEl.height; i += 15) {
     drawRect(net.xP, net.yP + i, net.width, net.height, net.color);
   }
 }
 
-//runGame function AKA the game loop
+// runGame Function AKA The Game Loop
 function runGame() {
-  //clearing the canvas
+  // clearing the canvas
   drawRect(0, 0, canvasEl.width, canvasEl.height, "#4683a0");
 
-  //draw net function
+  // Draw net function
   drawNet();
 
-  //draw score function
+  // draw score function
   drawText(
     playerPaddleRI.score,
     (1 * canvasEl.width) / 4,
     (1 * canvasEl.height) / 10,
     "white"
   );
-
   drawText(
     playerPaddleAI.score,
     (3 * canvasEl.width) / 4,
     (1 * canvasEl.height) / 10,
     "white"
   );
-  //drawing the paddles for RI and AI
+
+  // drawing the paddles for RI and AI
   drawRect(
     playerPaddleRI.xP,
     playerPaddleRI.yP,
@@ -121,18 +121,18 @@ function runGame() {
     playerPaddleAI.color
   );
 
-  //draw the ball
+  // drawing the ball
   drawCircle(ball.xP, ball.yP, ball.radius, ball.color);
 }
 
-//the RI event listener
+// The player Paddle RI Event Listener
 canvasEl.addEventListener("mousemove", movePaddle);
 function movePaddle(e) {
   let canvasRect = canvasEl.getBoundingClientRect();
   playerPaddleRI.yP = e.clientY - canvasRect.top - playerPaddleRI.height / 2;
 }
 
-//the collision detection of paddles function
+// The Collision Detection of Paddles Function
 function paddleColliDete(BALL, PADDLE) {
   BALL.top = BALL.yP - BALL.radius;
   BALL.bottom = BALL.yP + BALL.radius;
@@ -151,7 +151,8 @@ function paddleColliDete(BALL, PADDLE) {
     BALL.top < PADDLE.bottom
   );
 }
-//the resetBall function
+
+// the resetBall function
 function resetBall() {
   ball.xP = canvasEl.width / 2;
   ball.yP = canvasEl.height / 2;
@@ -159,18 +160,19 @@ function resetBall() {
   ball.speed = 7;
 }
 
-//the everything manager function
+// The everything Manager Function
 function everythingManager() {
-  //moving the ball by the amount of acceleration
+  // moving the ball by the amount of acceleration
   ball.xP += ball.xV;
   ball.yP += ball.yV;
 
-  //creating the AI
+  // creating the AI
   let intelligenceLevel = 0.1;
   playerPaddleAI.yP +=
     (ball.yP - (playerPaddleAI.yP + playerPaddleAI.height / 2)) *
     intelligenceLevel;
-  //bouncing off the top and bottom walls
+
+  // bouncing off the top and bottom walls
   if (ball.yP + ball.radius > canvasEl.height || ball.yP - ball.radius < 0) {
     ball.yV = -ball.yV;
     wall.play();
@@ -184,46 +186,46 @@ function everythingManager() {
   if (paddleColliDete(ball, player)) {
     hit.play();
 
-    //when the ball hits the paddle of any player
+    // when the ball hits the paddle of any player
     let collisionPoint = ball.yP - (player.yP + player.height / 2);
 
-    //normalization -> converting -50&50 -> -1&1&0
+    // normalization -> converting -50 & 50 -> -1 & 1 & 0
     collisionPoint = collisionPoint / (player.height / 2);
 
-    //calculating the angle at which the ball bounces back
+    // calculating the angle at which the bounces back (radians)
     let bounceAngle = (collisionPoint * Math.PI) / 4;
 
-    //calculating the dirtection of the ball when it bounces back
-    let direction = ball.xP + radius < canvasEl.width / 2 ? 1 : -1;
+    // calculating the direction of the ball when it bounces back
+    let direction = ball.xP + ball.radius < canvasEl.width / 2 ? 1 : -1;
 
-    //updating the velocity when the ball hits any paddle
+    // updating the velocity when the ball hits any paddle
+    //https://www.mathsisfun.com/sine-cosine-tangent.html
     ball.xV = direction * ball.speed * Math.cos(bounceAngle);
     ball.yV = ball.speed * Math.sin(bounceAngle);
 
-    //after each bounce back, the speed of thr ball should be increased
+    // after each bounce back, the speed of the ball should be increased
     ball.speed += 0.1;
   }
 
-  //updating the scores
+  // updating the scores
   if (ball.xP + ball.radius < 0) {
-    // the AI scores
+    // the AI scored
     playerPaddleAI.score++;
     AIScore.play();
     resetBall();
   } else if (ball.xP - ball.radius > canvasEl.width) {
-    //the RI scores
+    // the RI scored
     playerPaddleRI.score++;
     RIScore.play();
     resetBall();
   }
 }
 
-//the game initialization function
+// The Game Initialization function
 function gameInit() {
   everythingManager();
   runGame();
 }
-
-//looping the game to keep it running
+// Looping the game to keep it running
 const FPS = 60;
 setInterval(gameInit, 1000 / FPS);
