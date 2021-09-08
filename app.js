@@ -133,23 +133,30 @@ function movePaddle(e) {
 }
 
 //the collision detection of paddles function
-function paddleColliDete(ball, paddle) {
-  ball.top = ball.yP - ball.radius;
-  ball.bottom = ball.yP + ball.radius;
-  ball.left = ball.xP - ball.radius;
-  ball.right = ball.xP + ball.radius;
+function paddleColliDete(BALL, PADDLE) {
+  BALL.top = BALL.yP - BALL.radius;
+  BALL.bottom = BALL.yP + BALL.radius;
+  BALL.left = BALL.xP - BALL.radius;
+  BALL.right = BALL.xP + BALL.radius;
 
-  paddle.top = paddle.yP;
-  paddle.bottom = paddle.yp + paddle.height;
-  paddle.left = paddle.xP;
-  paddle.right = paddle.xP + paddle.width;
+  PADDLE.top = PADDLE.yP;
+  PADDLE.bottom = PADDLE.yP + PADDLE.height;
+  PADDLE.left = PADDLE.xP;
+  PADDLE.right = PADDLE.xP + PADDLE.width;
 
   return (
-    ball.right > paddle.left &&
-    ball.bottom > paddle.top &&
-    ball.left < paddle.right &&
-    ball.top < paddle.bottom
+    BALL.right > PADDLE.left &&
+    BALL.bottom > PADDLE.top &&
+    BALL.left < PADDLE.right &&
+    BALL.top < PADDLE.bottom
   );
+}
+//the resetBall function
+function resetBall() {
+  ball.xP = canvasEl.width / 2;
+  ball.yP = canvasEl.height / 2;
+
+  ball.speed = 7;
 }
 
 //the everything manager function
@@ -169,7 +176,10 @@ function everythingManager() {
     wall.play();
   }
 
-  let player = ball.xP < canvasEl.width / 2 ? playerPaddleRI : playerPaddleAI;
+  let player =
+    ball.xP + ball.radius < canvasEl.width / 2
+      ? playerPaddleRI
+      : playerPaddleAI;
 
   if (paddleColliDete(ball, player)) {
     hit.play();
@@ -184,14 +194,27 @@ function everythingManager() {
     let bounceAngle = (collisionPoint * Math.PI) / 4;
 
     //calculating the dirtection of the ball when it bounces back
-    let direction = ball.xP < canvasEl.width / 2 ? 1 : -1;
+    let direction = ball.xP + radius < canvasEl.width / 2 ? 1 : -1;
 
     //updating the velocity when the ball hits any paddle
     ball.xV = direction * ball.speed * Math.cos(bounceAngle);
-    ball.yV = direction * ball.speed * Math.sin(bounceAngle);
+    ball.yV = ball.speed * Math.sin(bounceAngle);
 
     //after each bounce back, the speed of thr ball should be increased
     ball.speed += 0.1;
+  }
+
+  //updating the scores
+  if (ball.xP + ball.radius < 0) {
+    // the AI scores
+    playerPaddleAI.score++;
+    AIScore.play();
+    resetBall();
+  } else if (ball.xP - ball.radius > canvasEl.width) {
+    //the RI scores
+    playerPaddleRI.score++;
+    RIScore.play();
+    resetBall();
   }
 }
 
