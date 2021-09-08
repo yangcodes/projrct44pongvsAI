@@ -125,8 +125,42 @@ function runGame() {
   drawCircle(ball.xP, ball.yP, ball.radius, ball.color);
 }
 
+//the collision detection of paddles function
+function paddleColliDete(ball, paddle) {
+  ball.top = ball.yP - ball.radius;
+  ball.bottom = ball.yP + ball.radius;
+  ball.left = ball.xP - ball.radius;
+  ball.right = ball.xP + ball.radius;
+
+  paddle.top = paddle.yP;
+  paddle.bottom = paddle.yp + paddle.height;
+  paddle.left = paddle.xP;
+  paddle.right = paddle.xP + paddle.width;
+
+  return (
+    ball.right > paddle.left &&
+    ball.bottom > paddle.top &&
+    ball.left < paddle.right &&
+    ball.top < paddle.bottom
+  );
+}
+
+//the everything manager function
+function everythingManager() {
+  //moving the ball by the amount of acceleration
+  //   ball.xP += ball.xV;
+  //   ball.yP += ball.yV;
+
+  //bouncing off the top and bottom walls
+  if (ball.yP + ball.radius > canvasEl.height || ball.yP - ball.radius < 0) {
+    ball.yV = -ball.yV;
+    wall.play();
+  }
+}
+
 //the game initialization function
 function gameInit() {
+  everythingManager();
   runGame();
 }
 
